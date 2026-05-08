@@ -27,6 +27,7 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/reset-password', [PasswordResetController::class, 'resetPassword']);
 Route::post('/forgot-password', [PasswordResetController::class, 'forgotPassword']);
+Route::get('/health', fn () => response()->json(['ok' => true]));
 Route::get('/user/search', [ProfileController::class, 'search']);
 Route::post('/user/search/filters', [ProfileController::class, 'searchWithFilters']);
 Route::get('/perfil/public/{usuario}/overview', [ProfileController::class, 'publicOverview']);

@@ -32,7 +32,9 @@ CLOUDINARY_VERIFY_SSL=true
 
 GOOGLE_CLIENT_ID=
 GOOGLE_CLIENT_SECRET=
-GOOGLE_REDIRECT_URI=https://TU-BACKEND.onrender.com/api/auth/google/callback
+GOOGLE_REDIRECT_URI=https://TU-BACKEND.onrender.com/auth/google/callback
+GITHUB_REDIRECT_URI=https://TU-BACKEND.onrender.com/auth/github/callback
+LINKEDIN_REDIRECT_URI=https://TU-BACKEND.onrender.com/auth/linkedin/callback
 
 SESSION_DRIVER=database
 QUEUE_CONNECTION=database

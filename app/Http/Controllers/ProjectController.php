@@ -4,12 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\ProjectRequest;
 use App\Models\Proyecto;
+use App\Services\CloudinaryService;
 use App\Support\OfficialSchema;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class ProjectController extends Controller
 {
+    public function __construct(private readonly CloudinaryService $cloudinaryService) {}
+
     public function index(Request $request): JsonResponse
     {
         $projects = Proyecto::forUser($request->user()->id)
@@ -50,6 +53,7 @@ class ProjectController extends Controller
         if ($imagePath) {
             $data['imagen'] = $imagePath;
         }
+        $previousImage = (string) $project->imagen;
 
         $project->update([
             'title' => $data['titulo'],
@@ -60,6 +64,10 @@ class ProjectController extends Controller
             'state' => OfficialSchema::databaseProjectState($data['estado'] ?? $project->estado),
         ]);
 
+        if ($imagePath && $previousImage !== $imagePath) {
+            $this->cloudinaryService->delete($previousImage);
+        }
+
         $this->syncProjectSkills($project, $data['tecnologias'] ?? null);
 
         return response()->json($project->fresh());
@@ -68,6 +76,7 @@ class ProjectController extends Controller
     public function destroy(Request $request, int $id): JsonResponse
     {
         $project = Proyecto::forUser($request->user()->id)->findOrFail($id);
+        $this->cloudinaryService->delete((string) $project->imagen);
         $project->skills()->detach();
         $project->delete();
 
@@ -78,7 +87,7 @@ class ProjectController extends Controller
     {
         $file = $request->file('imagen') ?? $request->file('cover');
 
-        return $file ? $file->store('proyectos', 'public') : null;
+        return $file ? $this->cloudinaryService->upload($file, 'portafolio/proyectos') : null;
     }
 
     private function syncProjectSkills(Proyecto $project, ?string $technologies): void
